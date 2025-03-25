@@ -1,9 +1,10 @@
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Random;
 
-public class Test {
+public class Test implements RotatingCells, SelectingCells {
     private static final int CUBE_SIZE = 8;
     private static final int ROTATION_STEPS = 3;
 
@@ -32,22 +33,45 @@ public class Test {
         }
     }
 
+//    private static String[][][] initializeCube(String inputText) {
+//        String[][][] cube = new String[CUBE_SIZE][CUBE_SIZE][CUBE_SIZE];
+//        String[] bytes = getHexRepresentation(inputText);
+//        int byteIndex = 0;
+//        for (int i = 0; i < CUBE_SIZE; i++) {
+//            for (int j = 0; j < CUBE_SIZE; j++) {
+//                for (int k = 0; k < CUBE_SIZE; k++) {
+//                    if (byteIndex < bytes.length) {
+//                        String binaryString = hexToBinary(bytes);
+//                        cube[i][j] = splitString(String.format("%8s", binaryString).replace(' ', '0'));
+//                    } else {
+//                        cube[i][j] = splitString("00000000");
+//                    }
+//                    byteIndex++;
+//                }
+//            }
+//        }
+//        return cube;
+//    }
+
     private static String[][][] initializeCube(String inputText) {
         String[][][] cube = new String[CUBE_SIZE][CUBE_SIZE][CUBE_SIZE];
-        byte[] bytes = inputText.getBytes(StandardCharsets.ISO_8859_1);
+        String[] hexArray = getHexRepresentation(inputText);
         int byteIndex = 0;
+
         for (int i = 0; i < CUBE_SIZE; i++) {
             for (int j = 0; j < CUBE_SIZE; j++) {
                 for (int k = 0; k < CUBE_SIZE; k++) {
-                    if (byteIndex < bytes.length) {
-                        String binaryString = Integer.toBinaryString(bytes[byteIndex++] & 0xFF);
-                        cube[i][j] = splitString(String.format("%8s", binaryString).replace(' ', '0'));
+                    if (byteIndex < hexArray.length) {
+                        String binaryString = hexToBinary(hexArray);
+                        cube[i][j] = splitString(binaryString);
                     } else {
                         cube[i][j] = splitString("00000000");
                     }
+                    byteIndex++;
                 }
             }
         }
+
         return cube;
     }
 
@@ -69,64 +93,64 @@ public class Test {
                 for (int k = 0; k < CUBE_SIZE; k++) {
                     int rotationAngle = rotationAngles[i * CUBE_SIZE * CUBE_SIZE + j * CUBE_SIZE + k];
                     encryptedCube[i][j][k] = cube[i][j][k];
-                    if ((i + j + k) % 2 == 0) {
-                        rotateEdgesAndTriangles(encryptedCube, i, j, k, rotationAngle);
-                    } else {
-                        // Углы куба остаются на месте
-                        processCorner(encryptedCube, i, j, k);
-                    }
+//                    if ((i + j + k) % 2 == 0) {
+//                        rotateEdgesAndTriangles(encryptedCube, i, j, k, rotationAngle);
+//                    } else {
+//                        // Углы куба остаются на месте
+//                        processCorner(encryptedCube, i, j, k);
+//                    }
                 }
             }
         }
         return encryptedCube;
     }
 
-    private static void processCorner(String[][][] cube, int i, int j, int k) {
-        // Пункт 1: Значение в углу остается неизменным
-        String temp = cube[i][j][k];
+//    private static void processCorner(String[][][] cube, int i, int j, int k) {
+//        // Пункт 1: Значение в углу остается неизменным
+//        String temp = cube[i][j][k];
+//
+//        // Пункт 2: Ребра, прилегающие к углу, поворачиваются на 120 градусов
+//        // Только для клеток с четными координатами
+//        if ((i % 2 == 0) && (j % 2 == 0)) {
+//            cube[i][j][0] = cube[i][0][k];
+//            cube[i][0][k] = cube[0][j][k];
+//            cube[0][j][k] = temp;
+//        } else {
+//            cube[i][j][0] = temp;
+//        }
+//
+//        if ((i % 2 == 0) && (k % 2 == 0)) {
+//            cube[i][0][0] = cube[0][j][0];
+//            cube[0][j][0] = cube[0][0][k];
+//            cube[0][0][k] = temp;
+//        } else {
+//            cube[i][0][0] = temp;
+//        }
+//
+//
+//        // Пункт 3: Грани, прилегающие к углу, поворачиваются на 120 градусов
+//        // Только для клеток с четными координатами
+//        if ((j % 2 == 0) && (k % 2 == 0)) {
+//            cube[i][0][0] = cube[0][j][0];
+//            cube[0][j][0] = cube[0][0][k];
+//            cube[0][0][k] = temp;
+//        } else {
+//            cube[i][0][0] = temp;
+//        }
+//    }
 
-        // Пункт 2: Ребра, прилегающие к углу, поворачиваются на 120 градусов
-        // Только для клеток с четными координатами
-        if ((i % 2 == 0) && (j % 2 == 0)) {
-            cube[i][j][0] = cube[i][0][k];
-            cube[i][0][k] = cube[0][j][k];
-            cube[0][j][k] = temp;
-        } else {
-            cube[i][j][0] = temp;
-        }
 
-        if ((i % 2 == 0) && (k % 2 == 0)) {
-            cube[i][0][0] = cube[0][j][0];
-            cube[0][j][0] = cube[0][0][k];
-            cube[0][0][k] = temp;
-        } else {
-            cube[i][0][0] = temp;
-        }
-
-
-        // Пункт 3: Грани, прилегающие к углу, поворачиваются на 120 градусов
-        // Только для клеток с четными координатами
-        if ((j % 2 == 0) && (k % 2 == 0)) {
-            cube[i][0][0] = cube[0][j][0];
-            cube[0][j][0] = cube[0][0][k];
-            cube[0][0][k] = temp;
-        } else {
-            cube[i][0][0] = temp;
-        }
-    }
-
-
-    private static void rotateEdgesAndTriangles(String[][][] cube, int i, int j, int k, int rotationAngle) {
-        String temp = cube[i][j][0];
-        cube[i][j][0] = cube[i][0][k];
-        cube[i][0][k] = cube[0][j][k];
-        cube[0][j][k] = temp;
-
-        temp = cube[i][0][0];
-        cube[i][0][0] = cube[0][j][0];
-        cube[0][j][0] = cube[0][0][k];
-        cube[0][0][k] = temp;
-    }
+//    private static void rotateEdgesAndTriangles(String[][][] cube, int i, int j, int k, int rotationAngle) {
+//        String temp = cube[i][j][0];
+//        cube[i][j][0] = cube[i][0][k];
+//        cube[i][0][k] = cube[0][j][k];
+//        cube[0][j][k] = temp;
+//
+//        temp = cube[i][0][0];
+//        cube[i][0][0] = cube[0][j][0];
+//        cube[0][j][0] = cube[0][0][k];
+//        cube[0][0][k] = temp;
+//    }
 
     private static void printCube(String[][][] cube) {
         for (int i = 0; i < CUBE_SIZE; i++) {
@@ -189,16 +213,29 @@ public class Test {
         return hexArray;
     }
 
-    public static String hexToBinary(String hex) {
-        // Удаляем префикс "0x", если он есть.
-        if (hex.startsWith("0x")) {
-            hex = hex.substring(2);
-        }
+//    public static String hexToBinary(String[] hex) {
+//        String hexSubstring = "";
+//        for (int index=0; index<hex.length; index++) {
+//            // Удаляем префикс "0x", если он есть.
+//            if (hex[index].startsWith("0x")) {
+//                hexSubstring = hex[index].substring(2);
+//            }
+//        }
+//
+//        // Преобразуем шестнадцатеричное значение в десятичное.
+//        int decimalValue = Integer.parseInt(hexSubstring, 16);
+//        // Преобразуем целое число в двоичное представление.
+//        return Integer.toBinaryString(decimalValue);
+//    }
 
-        // Преобразуем шестнадцатеричное значение в десятичное.
-        int decimalValue = Integer.parseInt(hex, 16);
-        // Преобразуем целое число в двоичное представление.
-        return Integer.toBinaryString(decimalValue);
+    private static String hexToBinary(String[] hex) {
+        StringBuilder binaryString = new StringBuilder();
+        for (String hexValue : hex) {
+            if (hexValue.startsWith("0x")) {
+                binaryString.append(String.format("%8s", Integer.toBinaryString(Integer.parseInt(hexValue.substring(2), 16))).replace(" ", "0"));
+            }
+        }
+        return binaryString.toString();
     }
 
     private static String bytesToBinary(byte[] bytes) {
