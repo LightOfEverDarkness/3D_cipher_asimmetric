@@ -3,7 +3,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
-public class Rotations implements RotatingCells {
+public class Rotations extends CubeED implements RotatingCells {
     public static double sigmoid(double t) {
         return 1 / (1 + Math.pow(Math.E, (-1 * t)));
     }

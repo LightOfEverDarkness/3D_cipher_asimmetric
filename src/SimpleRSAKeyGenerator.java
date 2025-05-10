@@ -3,7 +3,7 @@ import java.security.SecureRandom;
 
 public class SimpleRSAKeyGenerator {
     private BigInteger p, q, n, phi, e, d;
-    private int bitLength = 1024; // Длина ключа в битах
+    private int bitLength = 512; // Длина ключа в битах
     private SecureRandom random;
 
     public SimpleRSAKeyGenerator() {

@@ -94,4 +94,21 @@ public class Asimmetric_keys_generator {
     public int getSecret_exp_D() {
         return secret_exp_D;
     }
+    public static int[] extEuclidAlg(int a, int b){
+        int q, r, x, y;
+        int x1 = 0, x2 = 1, y1 = 1, y2 = 0;
+        while (b > 0){
+            q = a / b;
+            r = a - q * b;
+            x = x2 - q * x1;
+            y = y2 - q * y1;
+            a = b;
+            b = r;
+            x2 = x1;
+            x1 = x;
+            y2 = y1;
+            y1 = y;
+        }
+        return new int[]{x2, y2};
+    }
 }
